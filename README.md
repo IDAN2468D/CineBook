@@ -6,7 +6,7 @@ CineBook is a next-generation movie booking application built with **React Nativ
 
 ## ✨ Key Features
 
-### 🧠 AI Intelligence (Powered by Gemini 1.5)
+### 🧠 AI Intelligence (Powered by Gemini 2.5)
 - **Vibe Search**: Find movies using natural language (e.g., *"A 90s thriller with a plot twist that isn't too scary"*).
 - **Review Summarizer**: Instantly summarize hundreds of user reviews into a concise consensus.
 - **CineBot**: A persistent AI chat assistant for personalized recommendations and cinema FAQs.
@@ -28,7 +28,7 @@ CineBook is a next-generation movie booking application built with **React Nativ
 - **Frontend**: React Native, Expo, NativeWind (TailwindCSS), Lucide Icons
 - **Backend**: Node.js, Express, TypeScript
 - **Database**: MongoDB
-- **AI**: Google Gemini 1.5 Flash API
+- **AI**: Google Gemini 2.5 Flash API
 - **Maps**: React Native WebView / Leaflet (Custom Map Implementation)
 
 ## 🏁 Getting Started
