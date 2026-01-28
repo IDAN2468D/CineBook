@@ -82,7 +82,7 @@ export default function ChatScreen() {
                                 <Text className="text-purple-400 text-[10px] font-bold">AI ASSISTANT</Text>
                             </View>
                         </View>
-                        <Text className="text-slate-400 text-xs mt-0.5">Powered by Gemini 1.5</Text>
+                        <Text className="text-slate-400 text-xs mt-0.5">Powered by Gemini 2.5</Text>
                     </View>
                 </View>
 
