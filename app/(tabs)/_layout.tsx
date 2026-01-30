@@ -11,8 +11,8 @@ export default function TabLayout() {
         tabBarStyle: {
           position: 'absolute',
           bottom: 60, // Raised more as requested
-          left: 20,
-          right: 20,
+          left: 70,
+          right: 70,
           elevation: 5,
           backgroundColor: '#0f172a', // Slate 900
           borderRadius: 35, // Slightly rounder
