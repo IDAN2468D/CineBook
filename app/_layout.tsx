@@ -1,7 +1,8 @@
-import { DarkTheme, ThemeProvider } from '@react-navigation/native';
+import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
+import { useColorScheme } from 'nativewind';
 import { I18nManager } from 'react-native';
 
 // Force LTR
@@ -26,6 +27,7 @@ export default function RootLayout() {
   const router = useRouter();
   const [isFirstLaunch, setIsFirstLaunch] = useState<boolean | null>(null);
   const [isSplashVisible, setIsSplashVisible] = useState(true);
+  const { colorScheme } = useColorScheme();
 
   useEffect(() => {
     // Hide native splash screen immediately to show our custom animated one
@@ -76,14 +78,15 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={DarkTheme}>
+    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack screenOptions={{
-        headerStyle: { backgroundColor: '#0f172a' },
-        headerTintColor: '#fff',
+        headerStyle: { backgroundColor: colorScheme === 'dark' ? '#0f172a' : '#ffffff' },
+        headerTintColor: colorScheme === 'dark' ? '#fff' : '#000',
         headerTitleStyle: { fontWeight: 'bold' },
       }}>
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="register" options={{ headerShown: false }} />
+        <Stack.Screen name="forgot-password" options={{ headerShown: false }} />
         <Stack.Screen name="onboarding" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="movie/[id]" options={{ title: 'Movie Details' }} />
@@ -92,7 +95,7 @@ export default function RootLayout() {
         <Stack.Screen name="watchlist" options={{ headerShown: false }} />
         <Stack.Screen name="booking/[showtimeId]" options={{ title: 'Select Seats' }} />
       </Stack>
-      <StatusBar style="light" />
+      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
     </ThemeProvider>
   );
 }

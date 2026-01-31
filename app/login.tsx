@@ -27,6 +27,8 @@ export default function LoginScreen() {
     const router = useRouter();
 
     const [showPassword, setShowPassword] = useState(false);
+    const [isBiometricSupported, setIsBiometricSupported] = useState(false);
+    const [savedCredentials, setSavedCredentials] = useState<any>(null);
 
     // Animation refs
 
@@ -34,6 +36,17 @@ export default function LoginScreen() {
     const slideAnim = useRef(new Animated.Value(30)).current;
 
     useEffect(() => {
+        (async () => {
+            const compatible = await LocalAuthentication.hasHardwareAsync();
+            const enrolled = await LocalAuthentication.isEnrolledAsync();
+            setIsBiometricSupported(compatible && enrolled);
+
+            const credentials = await SecureStore.getItemAsync('user_credentials');
+            if (credentials) {
+                setSavedCredentials(JSON.parse(credentials));
+            }
+        })();
+
         Animated.parallel([
             Animated.timing(fadeAnim, {
                 toValue: 1,
@@ -115,26 +128,38 @@ export default function LoginScreen() {
         }
     };
 
-    const handleLogin = async () => {
-        if (!email || !password) return Alert.alert('Error', 'Please fill all fields');
+    const handleBiometricLogin = async () => {
+        if (!savedCredentials) return;
+
+        const result = await LocalAuthentication.authenticateAsync({
+            promptMessage: 'Login with Biometrics',
+            fallbackLabel: 'Enter Password',
+        });
+
+        if (result.success) {
+            setEmail(savedCredentials.email);
+            setPassword(savedCredentials.password);
+            // Trigger login automatically
+            manualLogin(savedCredentials.email, savedCredentials.password);
+        }
+    };
+
+    const manualLogin = async (e: string, p: string) => {
         setLoading(true);
         try {
-            const res = await api.post('auth/login', { email, password });
+            const res = await api.post('auth/login', { email: e, password: p });
             await setAuth(res.data.token, res.data.user);
+            await SecureStore.setItemAsync('user_credentials', JSON.stringify({ email: e, password: p }));
             router.replace('/(tabs)');
         } catch (error: any) {
             console.error('Login Error:', error);
-            if (error.response) {
-                Alert.alert('Login Failed', error.response.data?.message || 'Server error');
-            } else if (error.request) {
-                Alert.alert('Login Failed', 'Cannot connect to server. Check your network or IP.');
-            } else {
-                Alert.alert('Login Failed', error.message);
-            }
+            Alert.alert('Login Failed', error.response?.data?.message || 'Server error');
         } finally {
             setLoading(false);
         }
-    };
+    }
+
+    const handleLogin = () => manualLogin(email, password);
 
     return (
         <KeyboardAvoidingView
@@ -189,9 +214,19 @@ export default function LoginScreen() {
                         </TouchableOpacity>
                     </View>
 
-                    <TouchableOpacity className="self-end mb-6">
+                    <TouchableOpacity className="self-end mb-6" onPress={() => router.push('/forgot-password')}>
                         <Text className="text-blue-500 font-semibold">Forgot Password?</Text>
                     </TouchableOpacity>
+
+                    {isBiometricSupported && savedCredentials && (
+                        <TouchableOpacity
+                            className="bg-slate-800/50 py-4 rounded-2xl items-center border border-slate-700/50 mb-4 flex-row justify-center"
+                            onPress={handleBiometricLogin}
+                        >
+                            <Ionicons name="finger-print" size={24} color="#3b82f6" />
+                            <Text className="text-blue-500 text-lg font-bold ml-2">Quick Access</Text>
+                        </TouchableOpacity>
+                    )}
 
                     <TouchableOpacity
                         className={`py-4 rounded-2xl items-center shadow-lg shadow-blue-500/20 ${!email || !password ? 'bg-slate-800 opacity-50' : 'bg-blue-600'}`}
